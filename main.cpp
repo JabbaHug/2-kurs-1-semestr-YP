@@ -1,113 +1,107 @@
 #include <iostream>
 #include <limits>
-#include <functional>
+#include <string>
+#include "ConstantGenerator.h"
+#include "FunctionGenerator.h"
+#include "RandomGenerator.h"
+#include "Task1.h"
+#include "Task2.h"
 
-#include "../Solver/FunctionGenerator.h"
-#include "../Solver/RandomGenerator.h"
-#include "../Solver/Task1.h"
-#include "../Solver/Task2.h"
+using namespace miit::algebra;
 
-using miit::algebra::FunctionGenerator;
-using miit::algebra::RandomGenerator;
-using miit::algebra::Task1;
-using miit::algebra::Task2;
+enum class GenerationMode { Random = 1, Keyboard = 2, Constant = 3 };
+enum class TaskMode { First = 1, Second = 2 };
 
-/**
- * @brief Выполняет безопасное чтение целочисленного значения из стандартного потока ввода cin.
- * @param message Текстовое приглашение для пользователя, выводимое в консоль.
- * @return Корректно считанное целое число.
- */
-int readInt(const std::string& message)
+bool readInt(const std::string& message, int& value)
 {
-    int value{};
+    std::cout << message;
 
-    while (true)
+    if (std::cin >> value)
     {
-        std::cout << message;
-
-        if (std::cin >> value)
-        {
-            return value;
-        }
-
-        std::cout << "Ошибка ввода. Повторите.\n";
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        return true;
     }
+
+    std::cout << "Ошибка ввода.\n";
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return false;
+}
+
+template <typename Task>
+void printAndSolve(Task& task, const std::string& title)
+{
+    std::cout << "\nИсходная матрица:\n" << task.getMatrix() << '\n';
+    task.solve();
+    std::cout << "\n" << title << task.getMatrix() << '\n';
+}
+
+template <typename Generator>
+int runTask(const int rows, const int columns, Generator& generator, const TaskMode taskMode)
+{
+    if (taskMode == TaskMode::First)
+    {
+        Task1 task(rows, columns, generator);
+        printAndSolve(task, "После задания 1:\n");
+        return 0;
+    }
+    if (taskMode == TaskMode::Second)
+    {
+        Task2 task(rows, columns, generator);
+        printAndSolve(task, "После задания 2:\n");
+        return 0;
+    }
+    return 1;
 }
 
 int main()
 {
-    setlocale(LC_ALL, ".UTF8");
+    int rows{};
+    int columns{};
+    int modeValue{};
+    int taskValue{};
 
-    const int rows = readInt("Введите количество строк: ");
-    const int columns = readInt("Введите количество столбцов: ");
+    if (!readInt("Введите количество строк: ", rows) ||
+        !readInt("Введите количество столбцов: ", columns) ||
+        !readInt("Заполнение: 1 - случайное, 2 - клавиатура, 3 - константа: ", modeValue) ||
+        !readInt("Задание: 1 или 2: ", taskValue))
+    {
+        return 1;
+    }
 
     if (rows < 0 || columns < 0)
     {
-        std::cout << "Размеры не могут быть отрицательными.\n";
+        std::cout << "Размеры матрицы не могут быть отрицательными.\n";
         return 1;
     }
 
-    const int mode = readInt("Заполнение: 1 - случайное, 2 - с клавиатуры: ");
-    const int taskNumber = readInt("Задание: 1 или 2: ");
+    const auto mode = static_cast<GenerationMode>(modeValue);
+    const auto taskMode = static_cast<TaskMode>(taskValue);
 
-    if (mode == 1)
+    switch (mode)
+    {
+    case GenerationMode::Random:
     {
         RandomGenerator generator(-10, 10);
-
-        if (taskNumber == 1)
-        {
-            Task1 task(rows, columns, generator);
-            std::cout << "\nИсходная матрица:\n" << task.getMatrix() << '\n';
-            task.solve();
-            std::cout << "\nПосле задания 1 (нечетные заменены нулями):\n" << task.getMatrix() << '\n';
-        }
-        else if (taskNumber == 2)
-        {
-            Task2 task(rows, columns, generator);
-            std::cout << "\nИсходная матрица:\n" << task.getMatrix() << '\n';
-            task.solve();
-            std::cout << "\nПосле задания 2 (вставка первого столбца после столбцов с 0):\n" << task.getMatrix() << '\n';
-        }
-        else
-        {
-            std::cout << "Неизвестный номер задания.\n";
-            return 1;
-        }
+        return runTask(rows, columns, generator, taskMode);
     }
-    else if (mode == 2)
+    case GenerationMode::Keyboard:
     {
-        FunctionGenerator generator([]()
-        {
-            return readInt("Введите элемент: ");
+        FunctionGenerator generator([] {
+            int value{};
+            readInt("Введите элемент: ", value);
+            return value;
         });
-
-        if (taskNumber == 1)
-        {
-            Task1 task(rows, columns, generator);
-            std::cout << "\nИсходная матрица:\n" << task.getMatrix() << '\n';
-            task.solve();
-            std::cout << "\nПосле задания 1 (нечетные заменены нулями):\n" << task.getMatrix() << '\n';
-        }
-        else if (taskNumber == 2)
-        {
-            Task2 task(rows, columns, generator);
-            std::cout << "\nИсходная матрица:\n" << task.getMatrix() << '\n';
-            task.solve();
-            std::cout << "\nПосле задания 2 (вставка первого столбца после столбцов с 0):\n" << task.getMatrix() << '\n';
-        }
-        else
-        {
-            std::cout << "Неизвестный номер задания.\n";
-            return 1;
-        }
+        return runTask(rows, columns, generator, taskMode);
     }
-    else
+    case GenerationMode::Constant:
     {
+        int value{};
+        if (!readInt("Введите постоянное значение: ", value)) return 1;
+        ConstantGenerator generator(value);
+        return runTask(rows, columns, generator, taskMode);
+    }
+    default:
         std::cout << "Неизвестный режим заполнения.\n";
         return 1;
     }
-
-    return 0;
 }
