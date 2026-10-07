@@ -28,6 +28,6 @@ namespace miit::algebra
          * @brief Получает очередное значение вызовом сохранённой функции.
          * @return Целое число, возвращённое пользовательской функцией.
          */
-        int generate() override;
+        int generate() const override;
     };
 }
