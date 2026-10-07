@@ -4,7 +4,7 @@
 
 namespace miit::algebra
 {
-    Task2::Task2(const std::size_t rows, const std::size_t columns, Generator& generator)
+    Task2::Task2(const std::size_t rows, const std::size_t columns, const Generator& generator)
         : Exercise<int>(rows, columns, generator)
     {
     }
