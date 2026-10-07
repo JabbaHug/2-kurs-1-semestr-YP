@@ -40,7 +40,7 @@ namespace miit::algebra
         return data[index];
     }
 
-    void Matrix::fill(Generator& generator)
+    void Matrix::fill(const Generator& generator)
     {
         for (int& value : data) value = generator.generate();
     }
