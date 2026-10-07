@@ -1,11 +1,11 @@
 #include <iostream>
 #include <limits>
 #include <string>
-#include "ConstantGenerator.h"
-#include "FunctionGenerator.h"
-#include "RandomGenerator.h"
-#include "Task1.h"
-#include "Task2.h"
+#include "Solver/ConstantGenerator.h"
+#include "Solver/FunctionGenerator.h"
+#include "Solver/RandomGenerator.h"
+#include "Solver/Task1.h"
+#include "Solver/Task2.h"
 
 using namespace miit::algebra;
 
@@ -35,8 +35,8 @@ void printAndSolve(Task& task, const std::string& title)
     std::cout << "\n" << title << task.getMatrix() << '\n';
 }
 
-template <typename Generator>
-int runTask(const int rows, const int columns, Generator& generator, const TaskMode taskMode)
+template <typename Gen>
+int runTask(const int rows, const int columns, Gen& generator, const TaskMode taskMode)
 {
     if (taskMode == TaskMode::First)
     {
@@ -81,7 +81,19 @@ int main()
     {
     case GenerationMode::Random:
     {
-        RandomGenerator generator(-10, 10);
+        int minValue{};
+        int maxValue{};
+        if (!readInt("Введите минимальное значение: ", minValue) ||
+            !readInt("Введите максимальное значение: ", maxValue))
+        {
+            return 1;
+        }
+        if (minValue > maxValue)
+        {
+            std::cout << "Минимальное значение не может быть больше максимального.\n";
+            return 1;
+        }
+        RandomGenerator generator(minValue, maxValue);
         return runTask(rows, columns, generator, taskMode);
     }
     case GenerationMode::Keyboard:
