@@ -197,7 +197,7 @@ namespace miit::algebra
          *
          * @param generator Генератор значений.
          */
-        void fill(Generator& generator);
+        void fill(const Generator& generator);
 
         /**
          * @brief Заполняет матрицу постоянным значением.
