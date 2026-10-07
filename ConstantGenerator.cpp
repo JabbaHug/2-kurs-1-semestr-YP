@@ -3,5 +3,5 @@
 namespace miit::algebra
 {
     ConstantGenerator::ConstantGenerator(const int value) : value(value) {}
-    int ConstantGenerator::generate() { return value; }
+    int ConstantGenerator::generate() const { return value; }
 }
