@@ -18,7 +18,7 @@ namespace miit::algebra
          * @param columns Количество столбцов матрицы.
          * @param generator Генератор значений матрицы.
          */
-        Task1(const std::size_t rows, const std::size_t columns, Generator& generator);
+        Task1(const std::size_t rows, const std::size_t columns, const Generator& generator);
 
         /**
          * @brief Выполняет задание 1.
