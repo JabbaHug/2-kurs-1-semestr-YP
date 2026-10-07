@@ -13,6 +13,6 @@ namespace miit::algebra
         /** @brief Создаёт генератор постоянного значения. @param value Значение. */
         explicit ConstantGenerator(const int value);
         /** @brief Возвращает постоянное значение. @return Значение генератора. */
-        int generate() override;
+        int generate() const override;
     };
 }
