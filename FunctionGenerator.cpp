@@ -13,7 +13,7 @@ namespace miit::algebra
         }
     }
 
-    int FunctionGenerator::generate()
+    int FunctionGenerator::generate() const
     {
         return function();
     }
