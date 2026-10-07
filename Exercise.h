@@ -17,7 +17,7 @@ namespace miit::algebra
     {
     protected:
         Matrix matrix;
-        Generator& generator;
+        const Generator& generator;
 
     public:
         /**
@@ -26,7 +26,7 @@ namespace miit::algebra
          * @param columns Количество столбцов матрицы.
          * @param generator Генератор значений для заполнения матрицы.
          */
-        Exercise(const std::size_t rows, const std::size_t columns, Generator& generator)
+        Exercise(const std::size_t rows, const std::size_t columns, const Generator& generator)
             : matrix(rows, columns),
               generator(generator)
         {
