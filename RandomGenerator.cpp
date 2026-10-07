@@ -8,7 +8,7 @@ namespace miit::algebra
     {
     }
 
-    int RandomGenerator::generate()
+    int RandomGenerator::generate() const
     {
         return distribution(engine);
     }
