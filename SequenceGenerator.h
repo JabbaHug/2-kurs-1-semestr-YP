@@ -16,7 +16,7 @@ namespace miit::algebra
     {
     private:
         std::vector<int> values;
-        std::size_t position = 0;
+        mutable std::size_t position = 0;
 
     public:
         /**
@@ -30,6 +30,6 @@ namespace miit::algebra
          * @return Следующее целое число.
          * @throw std::out_of_range Если все значения уже выданы.
          */
-        int generate() override;
+        int generate() const override;
     };
 }
