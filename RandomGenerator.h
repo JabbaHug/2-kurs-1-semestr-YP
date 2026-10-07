@@ -13,8 +13,8 @@ namespace miit::algebra
     class RandomGenerator final : public Generator
     {
     private:
-        std::uniform_int_distribution<int> distribution;
-        std::mt19937 engine;
+        mutable std::uniform_int_distribution<int> distribution;
+        mutable std::mt19937 engine;
 
     public:
         /**
@@ -28,6 +28,6 @@ namespace miit::algebra
          * @brief Генерирует случайное целое число.
          * @return Случайное число из заданного диапазона.
          */
-        int generate() override;
+        int generate() const override;
     };
 }
