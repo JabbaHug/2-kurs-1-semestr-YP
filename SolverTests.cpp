@@ -1,13 +1,13 @@
 #include "CppUnitTest.h"
 
-#include "ConstantGenerator.h"
-#include "FunctionGenerator.h"
-#include "Generator.h"
-#include "Matrix.h"
-#include "RandomGenerator.h"
-#include "SequenceGenerator.h"
-#include "Task1.h"
-#include "Task2.h"
+#include "Solver/ConstantGenerator.h"
+#include "Solver/FunctionGenerator.h"
+#include "Solver/Generator.h"
+#include "Solver/Matrix.h"
+#include "Solver/RandomGenerator.h"
+#include "Solver/SequenceGenerator.h"
+#include "Solver/Task1.h"
+#include "Solver/Task2.h"
 
 #include <sstream>
 #include <stdexcept>
