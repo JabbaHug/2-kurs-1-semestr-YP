@@ -9,7 +9,7 @@ namespace miit::algebra
     {
     }
 
-    int SequenceGenerator::generate()
+    int SequenceGenerator::generate() const
     {
         if (position >= values.size())
         {
