@@ -1,71 +1,73 @@
 /**
  * @file Matrix.h
- * @brief Объявление класса двумерной целочисленной матрицы.
+ * @brief Объявление шаблонного класса двумерной матрицы.
  */
 
 #pragma once
 
 #include "Generator.h"
 
+#include <algorithm>
 #include <cstddef>
-#include <iosfwd>
+#include <istream>
+#include <ostream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace miit::algebra
 {
     /**
-     * @brief Класс двумерной целочисленной матрицы.
+     * @brief Шаблонный класс двумерной матрицы.
      *
-     * Класс хранит матрицу целых чисел в одномерном объекте
-     * std::vector<int>.
+     * Класс хранит матрицу элементов типа T в одномерном объекте
+     * std::vector<T>.
      *
      * Доступ к элементам выполняется через оператор [].
      * Класс поддерживает:
      * - создание матрицы;
      * - копирование и перемещение;
      * - заполнение значением;
-     * - заполнение с помощью Generator;
+     * - заполнение с помощью Generator (для целочисленных типов);
      * - удаление столбцов;
      * - вставку строк;
      * - преобразование матрицы в строку;
      * - ввод и вывод через потоки.
+     *
+     * @tparam T Тип элементов матрицы.
      */
+    template <typename T>
     class Matrix
     {
     private:
 
         /**
          * @brief Количество строк матрицы.
-         *
-         * Тип std::size_t используется для хранения
-         * неотрицательного размера.
          */
         std::size_t rowCount;
 
         /**
          * @brief Количество столбцов матрицы.
-         *
-         * Тип std::size_t используется для хранения
-         * неотрицательного размера.
          */
         std::size_t columnCount;
 
         /**
          * @brief Данные матрицы.
          *
-         * std::vector<int> хранит все элементы матрицы
+         * std::vector<T> хранит все элементы матрицы
          * последовательно в памяти.
          */
-        std::vector<int> data;
+        std::vector<T> data;
 
         /**
          * @brief Вычисляет плоский индекс элемента матрицы.
          *
-         * @param row Номер строки типа std::size_t.
-         * @param column Номер столбца типа std::size_t.
+         * @param row Номер строки.
+         * @param column Номер столбца.
          *
-         * @return Плоский индекс элемента в std::vector<int>.
+         * @return Плоский индекс элемента в std::vector<T>.
          *
          * @throw std::out_of_range Если строка или столбец
          * выходят за границы матрицы.
@@ -85,8 +87,8 @@ namespace miit::algebra
         /**
          * @brief Создаёт матрицу заданного размера.
          *
-         * @param rows Количество строк типа std::size_t.
-         * @param columns Количество столбцов типа std::size_t.
+         * @param rows Количество строк.
+         * @param columns Количество столбцов.
          */
         Matrix(
             const std::size_t rows,
@@ -96,45 +98,33 @@ namespace miit::algebra
         /**
          * @brief Создаёт матрицу и заполняет её значением.
          *
-         * @param rows Количество строк типа std::size_t.
-         * @param columns Количество столбцов типа std::size_t.
+         * @param rows Количество строк.
+         * @param columns Количество столбцов.
          * @param value Значение, которым заполняются все элементы.
          */
         Matrix(
             const std::size_t rows,
             const std::size_t columns,
-            const int value
+            const T& value
         );
 
         /**
          * @brief Конструктор копирования.
-         *
-         * @param other Исходная матрица.
          */
         Matrix(const Matrix& other) = default;
 
         /**
          * @brief Конструктор перемещения.
-         *
-         * @param other Матрица, из которой перемещаются данные.
          */
         Matrix(Matrix&& other) noexcept = default;
 
         /**
          * @brief Оператор копирующего присваивания.
-         *
-         * @param other Матрица, данные которой копируются.
-         *
-         * @return Ссылка на текущий объект Matrix.
          */
         Matrix& operator=(const Matrix& other) = default;
 
         /**
          * @brief Оператор перемещающего присваивания.
-         *
-         * @param other Матрица, данные которой перемещаются.
-         *
-         * @return Ссылка на текущий объект Matrix.
          */
         Matrix& operator=(Matrix&& other) noexcept = default;
 
@@ -145,55 +135,34 @@ namespace miit::algebra
 
         /**
          * @brief Возвращает количество строк.
-         *
-         * @return Количество строк типа std::size_t.
          */
         std::size_t rows() const noexcept;
 
         /**
          * @brief Возвращает количество столбцов.
-         *
-         * @return Количество столбцов типа std::size_t.
          */
         std::size_t columns() const noexcept;
 
         /**
          * @brief Проверяет, является ли матрица пустой.
-         *
-         * @return true, если матрица не содержит элементов;
-         * false в противном случае.
          */
         bool empty() const noexcept;
 
         /**
          * @brief Возвращает элемент матрицы по плоскому индексу.
-         *
-         * @param index Индекс элемента типа std::size_t.
-         *
-         * @return Ссылка на элемент типа int.
-         *
-         * @throw std::out_of_range Если индекс выходит
-         * за границы матрицы.
          */
-        int& operator[](const std::size_t index);
+        T& operator[](const std::size_t index);
 
         /**
          * @brief Возвращает элемент константной матрицы.
-         *
-         * @param index Индекс элемента типа std::size_t.
-         *
-         * @return Константная ссылка на элемент типа int.
-         *
-         * @throw std::out_of_range Если индекс выходит
-         * за границы матрицы.
          */
-        const int& operator[](const std::size_t index) const;
+        const T& operator[](const std::size_t index) const;
 
         /**
          * @brief Заполняет матрицу значениями генератора.
          *
-         * Для каждого элемента вызывается метод
-         * Generator::generate().
+         * Для каждого элемента вызывается Generator::generate().
+         * Значение приводится к типу T.
          *
          * @param generator Генератор значений.
          */
@@ -204,12 +173,12 @@ namespace miit::algebra
          *
          * @param value Значение для заполнения.
          */
-        void fill(const int value);
+        void fill(const T& value);
 
         /**
          * @brief Удаляет один столбец матрицы.
          *
-         * @param column Номер удаляемого столбца типа std::size_t.
+         * @param column Номер удаляемого столбца.
          *
          * @throw std::out_of_range Если номер столбца
          * выходит за границы матрицы.
@@ -220,51 +189,144 @@ namespace miit::algebra
          * @brief Вставляет строку после указанной строки.
          *
          * @param row Номер строки, после которой выполняется вставка.
-         * @param values Элементы вставляемой строки (размер должен
-         * совпадать с количеством столбцов).
+         * @param values Элементы вставляемой строки.
          *
          * @throw std::out_of_range Если номер строки выходит за границы.
          * @throw std::invalid_argument Если размер values не совпадает
          * с количеством столбцов.
          */
-        void insertRowAfter(const std::size_t row, const std::vector<int>& values);
+        void insertRowAfter(const std::size_t row, const std::vector<T>& values);
 
         /**
          * @brief Преобразует матрицу в строку.
-         *
-         * std::string содержит элементы матрицы,
-         * разделённые пробелами и переносами строк.
-         *
-         * @return Строковое представление матрицы.
          */
         std::string toString() const;
-
-        /**
-         * @brief Выводит матрицу в поток.
-         *
-         * @param output Объект std::ostream,
-         * в который выполняется вывод.
-         * @param matrix Матрица для вывода.
-         *
-         * @return Ссылка на std::ostream.
-         */
-        friend std::ostream& operator<<(
-            std::ostream& output,
-            const Matrix& matrix
-        );
-
-        /**
-         * @brief Считывает элементы матрицы из потока.
-         *
-         * @param input Объект std::istream,
-         * из которого выполняется ввод.
-         * @param matrix Матрица, которую необходимо заполнить.
-         *
-         * @return Ссылка на std::istream.
-         */
-        friend std::istream& operator>>(
-            std::istream& input,
-            Matrix& matrix
-        );
     };
+
+    /**
+     * @brief Выводит матрицу в поток.
+     */
+    template <typename T>
+    std::ostream& operator<<(std::ostream& output, const Matrix<T>& matrix);
+
+    /**
+     * @brief Считывает элементы матрицы из потока.
+     */
+    template <typename T>
+    std::istream& operator>>(std::istream& input, Matrix<T>& matrix);
+
+    // --- Реализация шаблона ---
+
+    template <typename T>
+    Matrix<T>::Matrix() : rowCount(0), columnCount(0) {}
+
+    template <typename T>
+    Matrix<T>::Matrix(const std::size_t rows, const std::size_t columns)
+        : rowCount(rows), columnCount(columns), data(rows * columns) {}
+
+    template <typename T>
+    Matrix<T>::Matrix(const std::size_t rows, const std::size_t columns, const T& value)
+        : rowCount(rows), columnCount(columns), data(rows * columns, value) {}
+
+    template <typename T>
+    std::size_t Matrix<T>::offset(const std::size_t row, const std::size_t column) const
+    {
+        if (row >= rowCount || column >= columnCount)
+            throw std::out_of_range("Matrix index is out of range");
+        return row * columnCount + column;
+    }
+
+    template <typename T>
+    std::size_t Matrix<T>::rows() const noexcept { return rowCount; }
+
+    template <typename T>
+    std::size_t Matrix<T>::columns() const noexcept { return columnCount; }
+
+    template <typename T>
+    bool Matrix<T>::empty() const noexcept { return data.empty(); }
+
+    template <typename T>
+    T& Matrix<T>::operator[](const std::size_t index)
+    {
+        if (index >= data.size()) throw std::out_of_range("Matrix index is out of range");
+        return data[index];
+    }
+
+    template <typename T>
+    const T& Matrix<T>::operator[](const std::size_t index) const
+    {
+        if (index >= data.size()) throw std::out_of_range("Matrix index is out of range");
+        return data[index];
+    }
+
+    template <typename T>
+    void Matrix<T>::fill(const Generator& generator)
+    {
+        for (T& value : data)
+            value = static_cast<T>(generator.generate());
+    }
+
+    template <typename T>
+    void Matrix<T>::fill(const T& value)
+    {
+        std::fill(data.begin(), data.end(), value);
+    }
+
+    template <typename T>
+    void Matrix<T>::removeColumn(const std::size_t column)
+    {
+        if (column >= columnCount) throw std::out_of_range("Column index is out of range");
+        std::vector<T> newData;
+        newData.reserve(rowCount * (columnCount - 1));
+        for (std::size_t row = 0; row < rowCount; ++row)
+            for (std::size_t currentColumn = 0; currentColumn < columnCount; ++currentColumn)
+                if (currentColumn != column)
+                    newData.push_back(data[row * columnCount + currentColumn]);
+        --columnCount;
+        data = std::move(newData);
+    }
+
+    template <typename T>
+    void Matrix<T>::insertRowAfter(const std::size_t row, const std::vector<T>& values)
+    {
+        if (row >= rowCount)
+            throw std::out_of_range("Row index is out of range");
+        if (values.size() != columnCount)
+            throw std::invalid_argument("Row size does not match column count");
+
+        const auto insertPosition = data.begin() + static_cast<std::ptrdiff_t>((row + 1) * columnCount);
+        data.insert(insertPosition, values.begin(), values.end());
+        ++rowCount;
+    }
+
+    template <typename T>
+    std::string Matrix<T>::toString() const
+    {
+        std::ostringstream output;
+        for (std::size_t row = 0; row < rowCount; ++row)
+        {
+            for (std::size_t column = 0; column < columnCount; ++column)
+            {
+                if (column != 0) output << ' ';
+                output << data[row * columnCount + column];
+            }
+            if (row + 1 < rowCount) output << '\n';
+        }
+        return output.str();
+    }
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& output, const Matrix<T>& matrix)
+    {
+        output << matrix.toString();
+        return output;
+    }
+
+    template <typename T>
+    std::istream& operator>>(std::istream& input, Matrix<T>& matrix)
+    {
+        for (std::size_t index = 0; index < matrix.rows() * matrix.columns(); ++index)
+            input >> matrix[index];
+        return input;
+    }
 }

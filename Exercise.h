@@ -16,7 +16,7 @@ namespace miit::algebra
     class Exercise
     {
     protected:
-        Matrix matrix;
+        Matrix<T> matrix;
         const Generator& generator;
 
     public:
@@ -58,7 +58,7 @@ namespace miit::algebra
          * @brief Возвращает константную ссылку на матрицу.
          * @return Константная ссылка на матрицу задания.
          */
-        const Matrix& getMatrix() const noexcept
+        const Matrix<T>& getMatrix() const noexcept
         {
             return matrix;
         }
@@ -67,7 +67,7 @@ namespace miit::algebra
          * @brief Возвращает ссылку на матрицу для изменения.
          * @return Ссылка на матрицу задания.
          */
-        Matrix& getMatrix() noexcept
+        Matrix<T>& getMatrix() noexcept
         {
             return matrix;
         }

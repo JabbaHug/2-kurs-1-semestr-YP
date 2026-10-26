@@ -1,11 +1,12 @@
 #include <iostream>
 #include <limits>
 #include <string>
-#include "Solver/ConstantGenerator.h"
-#include "Solver/FunctionGenerator.h"
-#include "Solver/RandomGenerator.h"
-#include "Solver/Task1.h"
-#include "Solver/Task2.h"
+
+#include "ConstantGenerator.h"
+#include "FunctionGenerator.h"
+#include "RandomGenerator.h"
+#include "Task1.h"
+#include "Task2.h"
 
 using namespace miit::algebra;
 
@@ -40,13 +41,13 @@ int runTask(const int rows, const int columns, Gen& generator, const TaskMode ta
 {
     if (taskMode == TaskMode::First)
     {
-        Task1 task(rows, columns, generator);
+        Task1 task(static_cast<std::size_t>(rows), static_cast<std::size_t>(columns), generator);
         printAndSolve(task, "После задания 1:\n");
         return 0;
     }
     if (taskMode == TaskMode::Second)
     {
-        Task2 task(rows, columns, generator);
+        Task2 task(static_cast<std::size_t>(rows), static_cast<std::size_t>(columns), generator);
         printAndSolve(task, "После задания 2:\n");
         return 0;
     }
@@ -108,7 +109,10 @@ int main()
     case GenerationMode::Constant:
     {
         int value{};
-        if (!readInt("Введите постоянное значение: ", value)) return 1;
+        if (!readInt("Введите постоянное значение: ", value))
+        {
+            return 1;
+        }
         ConstantGenerator generator(value);
         return runTask(rows, columns, generator, taskMode);
     }

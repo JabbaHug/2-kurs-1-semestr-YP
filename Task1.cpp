@@ -1,5 +1,4 @@
 #include "Task1.h"
-#include <stdexcept>
 
 namespace miit::algebra
 {
