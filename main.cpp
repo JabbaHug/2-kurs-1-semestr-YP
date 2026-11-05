@@ -61,10 +61,18 @@ int main()
     int modeValue{};
     int taskValue{};
 
+    const std::string generationMessage =
+        "Заполнение: " + std::to_string(static_cast<int>(GenerationMode::Random)) + " - случайное, " +
+        std::to_string(static_cast<int>(GenerationMode::Keyboard)) + " - клавиатура, " +
+        std::to_string(static_cast<int>(GenerationMode::Constant)) + " - константа: ";
+    const std::string taskMessage =
+        "Задание: " + std::to_string(static_cast<int>(TaskMode::First)) + " или " +
+        std::to_string(static_cast<int>(TaskMode::Second)) + ": ";
+
     if (!readInt("Введите количество строк: ", rows) ||
         !readInt("Введите количество столбцов: ", columns) ||
-        !readInt("Заполнение: 1 - случайное, 2 - клавиатура, 3 - константа: ", modeValue) ||
-        !readInt("Задание: 1 или 2: ", taskValue))
+        !readInt(generationMessage, modeValue) ||
+        !readInt(taskMessage, taskValue))
     {
         return 1;
     }

@@ -22,8 +22,8 @@ namespace miit::algebra
     /**
      * @brief Шаблонный класс двумерной матрицы.
      *
-     * Класс хранит матрицу элементов типа T в одномерном объекте
-     * std::vector<T>.
+     * Класс хранит матрицу элементов типа T в двумерном объекте
+     * std::vector<std::vector<T>>.
      *
      * Доступ к элементам выполняется через оператор [].
      * Класс поддерживает:
@@ -54,12 +54,9 @@ namespace miit::algebra
         std::size_t columnCount;
 
         /**
-         * @brief Данные матрицы.
-         *
-         * std::vector<T> хранит все элементы матрицы
-         * последовательно в памяти.
+         * @brief Двумерный вектор элементов матрицы.
          */
-        std::vector<T> data;
+        std::vector<std::vector<T>> matrix;
 
         /**
          * @brief Вычисляет плоский индекс элемента матрицы.
@@ -67,7 +64,7 @@ namespace miit::algebra
          * @param row Номер строки.
          * @param column Номер столбца.
          *
-         * @return Плоский индекс элемента в std::vector<T>.
+         * @return Плоский индекс элемента матрицы.
          *
          * @throw std::out_of_range Если строка или столбец
          * выходят за границы матрицы.
@@ -222,11 +219,11 @@ namespace miit::algebra
 
     template <typename T>
     Matrix<T>::Matrix(const std::size_t rows, const std::size_t columns)
-        : rowCount(rows), columnCount(columns), data(rows * columns) {}
+        : rowCount(rows), columnCount(columns), matrix(rows, std::vector<T>(columns)) {}
 
     template <typename T>
     Matrix<T>::Matrix(const std::size_t rows, const std::size_t columns, const T& value)
-        : rowCount(rows), columnCount(columns), data(rows * columns, value) {}
+        : rowCount(rows), columnCount(columns), matrix(rows, std::vector<T>(columns, value)) {}
 
     template <typename T>
     std::size_t Matrix<T>::offset(const std::size_t row, const std::size_t column) const
@@ -243,47 +240,44 @@ namespace miit::algebra
     std::size_t Matrix<T>::columns() const noexcept { return columnCount; }
 
     template <typename T>
-    bool Matrix<T>::empty() const noexcept { return data.empty(); }
+    bool Matrix<T>::empty() const noexcept { return rowCount == 0 || columnCount == 0; }
 
     template <typename T>
     T& Matrix<T>::operator[](const std::size_t index)
     {
-        if (index >= data.size()) throw std::out_of_range("Matrix index is out of range");
-        return data[index];
+        if (index >= rowCount * columnCount) throw std::out_of_range("Matrix index is out of range");
+        return matrix[index / columnCount][index % columnCount];
     }
 
     template <typename T>
     const T& Matrix<T>::operator[](const std::size_t index) const
     {
-        if (index >= data.size()) throw std::out_of_range("Matrix index is out of range");
-        return data[index];
+        if (index >= rowCount * columnCount) throw std::out_of_range("Matrix index is out of range");
+        return matrix[index / columnCount][index % columnCount];
     }
 
     template <typename T>
     void Matrix<T>::fill(const Generator& generator)
     {
-        for (T& value : data)
-            value = static_cast<T>(generator.generate());
+        for (std::vector<T>& row : matrix)
+            for (T& value : row)
+                value = static_cast<T>(generator.generate());
     }
 
     template <typename T>
     void Matrix<T>::fill(const T& value)
     {
-        std::fill(data.begin(), data.end(), value);
+        for (std::vector<T>& row : matrix)
+            std::fill(row.begin(), row.end(), value);
     }
 
     template <typename T>
     void Matrix<T>::removeColumn(const std::size_t column)
     {
         if (column >= columnCount) throw std::out_of_range("Column index is out of range");
-        std::vector<T> newData;
-        newData.reserve(rowCount * (columnCount - 1));
-        for (std::size_t row = 0; row < rowCount; ++row)
-            for (std::size_t currentColumn = 0; currentColumn < columnCount; ++currentColumn)
-                if (currentColumn != column)
-                    newData.push_back(data[row * columnCount + currentColumn]);
+        for (std::vector<T>& row : matrix)
+            row.erase(row.begin() + static_cast<std::ptrdiff_t>(column));
         --columnCount;
-        data = std::move(newData);
     }
 
     template <typename T>
@@ -294,8 +288,8 @@ namespace miit::algebra
         if (values.size() != columnCount)
             throw std::invalid_argument("Row size does not match column count");
 
-        const auto insertPosition = data.begin() + static_cast<std::ptrdiff_t>((row + 1) * columnCount);
-        data.insert(insertPosition, values.begin(), values.end());
+        const auto insertPosition = matrix.begin() + static_cast<std::ptrdiff_t>(row + 1);
+        matrix.insert(insertPosition, values);
         ++rowCount;
     }
 
@@ -308,7 +302,7 @@ namespace miit::algebra
             for (std::size_t column = 0; column < columnCount; ++column)
             {
                 if (column != 0) output << ' ';
-                output << data[row * columnCount + column];
+                output << matrix[row][column];
             }
             if (row + 1 < rowCount) output << '\n';
         }
