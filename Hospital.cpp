@@ -1,8 +1,5 @@
 #include "Hospital.h"
 
-#include <stdexcept>
-#include <utility>
-
 Hospital::Hospital(const std::string& name)
     : name_(name)
 {
@@ -18,14 +15,16 @@ void Hospital::addWard(const Ward& ward)
     wards_.push_back(ward);
 }
 
-void Hospital::addWorker(std::unique_ptr<MedicalWorker> worker)
+void Hospital::addWorker(const Doctor& doctor)
 {
-    if (worker == nullptr)
-    {
-        throw std::invalid_argument("Работник не задан.");
-    }
+    doctors_.push_back(doctor);
+    workerOrder_.emplace_back(true, doctors_.size() - 1);
+}
 
-    workers_.push_back(std::move(worker));
+void Hospital::addWorker(const Nurse& nurse)
+{
+    nurses_.push_back(nurse);
+    workerOrder_.emplace_back(false, nurses_.size() - 1);
 }
 
 const std::string& Hospital::getName() const noexcept
@@ -44,15 +43,30 @@ const std::vector<Ward>& Hospital::getWards() const noexcept
     return wards_;
 }
 
-const std::vector<std::unique_ptr<MedicalWorker>>&
-Hospital::getWorkers() const noexcept
+std::vector<std::reference_wrapper<const MedicalWorker>>
+Hospital::getWorkers() const
 {
-    return workers_;
+    std::vector<std::reference_wrapper<const MedicalWorker>> result;
+    result.reserve(workerOrder_.size());
+
+    for (const auto& worker : workerOrder_)
+    {
+        if (worker.first)
+        {
+            result.emplace_back(doctors_[worker.second]);
+        }
+        else
+        {
+            result.emplace_back(nurses_[worker.second]);
+        }
+    }
+
+    return result;
 }
 
 std::string Hospital::toString() const
 {
     return name_
-        + ", работников: " + std::to_string(workers_.size())
+        + ", работников: " + std::to_string(workerOrder_.size())
         + ", палат: " + std::to_string(wards_.size());
 }

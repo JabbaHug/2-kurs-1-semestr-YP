@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Department.h"
-#include "MedicalWorker.h"
+#include "Doctor.h"
+#include "Nurse.h"
 #include "Ward.h"
 
-#include <memory>
+#include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 /**
@@ -21,7 +23,9 @@ private:
 
     std::vector<Department> departments_;
     std::vector<Ward> wards_;
-    std::vector<std::unique_ptr<MedicalWorker>> workers_;
+    std::vector<Doctor> doctors_;
+    std::vector<Nurse> nurses_;
+    std::vector<std::pair<bool, std::size_t>> workerOrder_;
 
 public:
     /**
@@ -43,11 +47,16 @@ public:
     void addWard(const Ward& ward);
 
     /**
-     * @brief Добавляет работника и принимает владение им.
-     * @param worker Умный указатель на медицинского работника.
-     * @throws std::invalid_argument Если указатель пустой.
+     * @brief Добавляет врача в больницу.
+     * @param doctor Добавляемый врач.
      */
-    void addWorker(std::unique_ptr<MedicalWorker> worker);
+    void addWorker(const Doctor& doctor);
+
+    /**
+     * @brief Добавляет медсестру в больницу.
+     * @param nurse Добавляемая медсестра.
+     */
+    void addWorker(const Nurse& nurse);
 
     /**
      * @return Название больницы.
@@ -65,10 +74,9 @@ public:
     const std::vector<Ward>& getWards() const noexcept;
 
     /**
-     * @return Коллекция работников базового типа MedicalWorker.
+     * @return Коллекция ссылок на работников как на MedicalWorker.
      */
-    const std::vector<std::unique_ptr<MedicalWorker>>&
-        getWorkers() const noexcept;
+    std::vector<std::reference_wrapper<const MedicalWorker>> getWorkers() const;
 
     /**
      * @return Сводная информация о больнице.

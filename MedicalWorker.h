@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Person.h"
+
 #include <string>
 
 /**
@@ -8,10 +10,9 @@
  * Содержит общую информацию о сотрудниках:
  * врачах и среднем медицинском персонале.
  */
-class MedicalWorker
+class MedicalWorker : public Person
 {
 protected:
-    std::string fullName_;
     std::string position_;
     std::string department_;
 
@@ -31,14 +32,7 @@ public:
     /**
      * @brief Виртуальный деструктор.
      */
-    virtual ~MedicalWorker() = default;
-
-    /**
-     * @brief Возвращает ФИО работника.
-     *
-     * @return ФИО.
-     */
-    const std::string& getFullName() const noexcept;
+    ~MedicalWorker() override = default;
 
     /**
      * @brief Возвращает должность.
@@ -59,5 +53,5 @@ public:
      *
      * @return Информация о работнике.
      */
-    virtual std::string toString() const = 0;
+    std::string toString() const override = 0;
 };

@@ -4,10 +4,8 @@
 #include "Hospital.h"
 #include "Nurse.h"
 
-#include <memory>
 #include <stdexcept>
 #include <string>
-#include <utility>
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -99,7 +97,7 @@ namespace HospitalTests
                 "Иванов Иван",
                 "Терапевтическое",
                 "Терапевт",
-                std::vector<std::string>{"Смирнов А.А."}
+                std::vector<Patient>{Patient("Смирнов А.А.", "ОРВИ", 101)}
             );
 
             Assert::AreEqual(
@@ -191,31 +189,24 @@ namespace HospitalTests
         {
             Hospital hospital("ГКБ №1");
 
-            std::unique_ptr<MedicalWorker> doctor =
-                std::make_unique<Doctor>(
-                    "Иванов Иван",
-                    "Терапия",
-                    "Терапевт",
-                    std::vector<std::string>{"Пациент"}
-                );
+            const Doctor doctor(
+                "Иванов Иван",
+                "Терапия",
+                "Терапевт",
+                std::vector<Patient>{Patient("Пациент", "ОРВИ", 101)}
+            );
 
-            const std::string expectedDoctor =
-                doctor->toString();
+            const std::string expectedDoctor = doctor.toString();
+            hospital.addWorker(doctor);
 
-            hospital.addWorker(std::move(doctor));
-
-            Assert::IsTrue(doctor == nullptr);
-
-            auto nurse = std::make_unique<Nurse>(
+            const Nurse nurse(
                 "Петрова Анна",
                 "Терапия",
                 "Дневная"
             );
 
-            const std::string expectedNurse =
-                nurse->toString();
-
-            hospital.addWorker(std::move(nurse));
+            const std::string expectedNurse = nurse.toString();
+            hospital.addWorker(nurse);
 
             const auto& workers = hospital.getWorkers();
 
@@ -223,12 +214,12 @@ namespace HospitalTests
 
             Assert::AreEqual(
                 expectedDoctor,
-                workers[0]->toString()
+                workers[0].get().toString()
             );
 
             Assert::AreEqual(
                 expectedNurse,
-                workers[1]->toString()
+                workers[1].get().toString()
             );
 
             Assert::AreEqual(
@@ -239,18 +230,27 @@ namespace HospitalTests
             );
         }
 
-        TEST_METHOD(Hospital_RejectsNullWorker)
+        TEST_METHOD(Person_IdIsUniqueAcrossPatientsAndWorkers)
         {
-            Hospital hospital("ГКБ №1");
+            const Patient first("Иванов Иван", "Грипп", 101);
+            const Doctor doctor("Петров Пётр", "Терапия", "Терапевт", {first});
+            const Nurse nurse("Сидорова Анна", "Терапия", "Дневная");
+            const Patient second("Иванов Иван", "Грипп", 101);
 
-            Assert::ExpectException<std::invalid_argument>(
-                [&hospital]()
-                {
-                    hospital.addWorker(nullptr);
-                }
-            );
+            Assert::IsTrue(first.getId() != doctor.getId());
+            Assert::IsTrue(first.getId() != nurse.getId());
+            Assert::IsTrue(first.getId() != second.getId());
+            Assert::IsTrue(doctor.getId() != nurse.getId());
+        }
 
-            Assert::IsTrue(hospital.getWorkers().empty());
+        TEST_METHOD(Doctor_StoresPatientsNotNames)
+        {
+            const Patient patient("Иванов Иван", "Грипп", 101);
+            const Doctor doctor("Врач", "Терапия", "Терапевт", {patient});
+
+            Assert::AreEqual<std::size_t>(1, doctor.getPatients().size());
+            Assert::AreEqual(patient.getId(), doctor.getPatients()[0].getId());
+            Assert::IsTrue(doctor.observesPatient(patient));
         }
     };
 }

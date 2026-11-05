@@ -1,14 +1,15 @@
 #pragma once
 
+#include "Person.h"
+
 #include <string>
 
 /**
  * @brief Пациент больницы.
  */
-class Patient
+class Patient : public Person
 {
 private:
-    std::string fullName_;
     std::string diagnosis_;
     int wardNumber_;
 
@@ -25,11 +26,6 @@ public:
         const int wardNumber);
 
     /**
-     * @return ФИО пациента.
-     */
-    const std::string& getFullName() const noexcept;
-
-    /**
      * @return Диагноз.
      */
     const std::string& getDiagnosis() const noexcept;
@@ -42,5 +38,5 @@ public:
     /**
      * @return Информация о пациенте.
      */
-    std::string toString() const;
+    std::string toString() const override;
 };

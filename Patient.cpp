@@ -4,15 +4,10 @@ Patient::Patient(
     const std::string& fullName,
     const std::string& diagnosis,
     const int wardNumber)
-    : fullName_(fullName),
+    : Person(fullName),
       diagnosis_(diagnosis),
       wardNumber_(wardNumber)
 {
-}
-
-const std::string& Patient::getFullName() const noexcept
-{
-    return fullName_;
 }
 
 const std::string& Patient::getDiagnosis() const noexcept

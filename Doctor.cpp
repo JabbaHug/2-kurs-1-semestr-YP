@@ -6,10 +6,10 @@ Doctor::Doctor(
     const std::string& fullName,
     const std::string& department,
     const std::string& specialization,
-    const std::vector<std::string>& patientNames)
+    const std::vector<Patient>& patients)
     : MedicalWorker(fullName, "Врач", department),
       specialization_(specialization),
-      patientNames_(patientNames)
+      patients_(patients)
 {
 }
 
@@ -18,16 +18,29 @@ const std::string& Doctor::getSpecialization() const noexcept
     return specialization_;
 }
 
-const std::vector<std::string>& Doctor::getPatientNames() const noexcept
+const std::vector<Patient>& Doctor::getPatients() const noexcept
 {
-    return patientNames_;
+    return patients_;
 }
 
 bool Doctor::observesPatient(const std::string& patientName) const
 {
-    for (const std::string& current : patientNames_)
+    for (const Patient& current : patients_)
     {
-        if (current == patientName)
+        if (current.getFullName() == patientName)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Doctor::observesPatient(const Patient& patient) const
+{
+    for (const Patient& current : patients_)
+    {
+        if (current.getId() == patient.getId())
         {
             return true;
         }
@@ -45,11 +58,11 @@ std::string Doctor::toString() const
            << ", специализация: " << specialization_
            << ", пациенты: ";
 
-    for (std::size_t i = 0; i < patientNames_.size(); ++i)
+    for (std::size_t i = 0; i < patients_.size(); ++i)
     {
-        stream << patientNames_[i];
+        stream << patients_[i].getFullName();
 
-        if (i + 1 < patientNames_.size())
+        if (i + 1 < patients_.size())
         {
             stream << ", ";
         }

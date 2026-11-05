@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MedicalWorker.h"
+#include "Patient.h"
 
 #include <string>
 #include <vector>
@@ -15,7 +16,7 @@ class Doctor : public MedicalWorker
 {
 private:
     std::string specialization_;
-    std::vector<std::string> patientNames_;
+    std::vector<Patient> patients_;
 
 public:
     /**
@@ -24,13 +25,13 @@ public:
      * @param fullName ФИО врача.
      * @param department Отделение.
      * @param specialization Специализация врача.
-     * @param patientNames ФИО наблюдаемых пациентов.
+     * @param patients Наблюдаемые пациенты.
      */
     Doctor(
         const std::string& fullName,
         const std::string& department,
         const std::string& specialization,
-        const std::vector<std::string>& patientNames);
+        const std::vector<Patient>& patients);
 
     /**
      * @brief Возвращает специализацию.
@@ -42,9 +43,9 @@ public:
     /**
      * @brief Возвращает список пациентов.
      *
-     * @return ФИО пациентов.
+     * @return Объекты пациентов.
      */
-    const std::vector<std::string>& getPatientNames() const noexcept;
+    const std::vector<Patient>& getPatients() const noexcept;
 
     /**
      * @brief Проверяет, наблюдает ли врач указанного пациента.
@@ -53,6 +54,13 @@ public:
      * @return true, если пациент есть в списке.
      */
     bool observesPatient(const std::string& patientName) const;
+
+    /**
+     * @brief Проверяет, наблюдает ли врач пациента по ID.
+     * @param patient Пациент.
+     * @return true, если пациент наблюдается у врача.
+     */
+    bool observesPatient(const Patient& patient) const;
 
     /**
      * @brief Возвращает строковое представление врача.

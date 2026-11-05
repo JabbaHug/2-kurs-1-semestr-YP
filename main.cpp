@@ -1,5 +1,4 @@
 #include <iostream>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -13,8 +12,7 @@
  * Создаёт больницу, отделения, палаты, пациентов
  * и медицинских работников.
  *
- * Работники хранятся как коллекция умных указателей
- * на базовый класс MedicalWorker. Вывод использует полиморфизм.
+ * Работники выводятся как коллекция базового класса MedicalWorker.
  *
  * @return 0 при успешном завершении.
  */
@@ -30,18 +28,16 @@ int main()
 
     // Палаты и пациенты.
 
+    const Patient patient1("Смирнов Алексей Андреевич", "Пневмония", 101);
+    const Patient patient2("Кузнецова Мария Олеговна", "Грипп", 101);
+    const Patient patient3("Орлов Дмитрий Сергеевич", "Аппендицит", 205);
+
     Ward ward101(101, 4);
-    ward101.addPatient(
-        Patient("Смирнов Алексей Андреевич", "Пневмония", 101)
-    );
-    ward101.addPatient(
-        Patient("Кузнецова Мария Олеговна", "Грипп", 101)
-    );
+    ward101.addPatient(patient1);
+    ward101.addPatient(patient2);
 
     Ward ward205(205, 2);
-    ward205.addPatient(
-        Patient("Орлов Дмитрий Сергеевич", "Аппендицит", 205)
-    );
+    ward205.addPatient(patient3);
 
     hospital.addWard(ward101);
     hospital.addWard(ward205);
@@ -49,19 +45,16 @@ int main()
     // Медицинские работники — Doctor и Nurse.
 
     hospital.addWorker(
-        std::make_unique<Doctor>(
+        Doctor(
             "Иванов Иван Иванович",
             "Терапевтическое",
             "Терапевт",
-            std::vector<std::string>{
-                "Смирнов Алексей Андреевич",
-                "Кузнецова Мария Олеговна"
-            }
+            std::vector<Patient>{patient1, patient2}
         )
     );
 
     hospital.addWorker(
-        std::make_unique<Nurse>(
+        Nurse(
             "Петрова Анна Сергеевна",
             "Терапевтическое",
             "Дневная"
@@ -69,18 +62,16 @@ int main()
     );
 
     hospital.addWorker(
-        std::make_unique<Doctor>(
+        Doctor(
             "Сидоров Пётр Николаевич",
             "Хирургическое",
             "Хирург",
-            std::vector<std::string>{
-                "Орлов Дмитрий Сергеевич"
-            }
+            std::vector<Patient>{patient3}
         )
     );
 
     hospital.addWorker(
-        std::make_unique<Nurse>(
+        Nurse(
             "Козлова Елена Викторовна",
             "Хирургическое",
             "Ночная"
@@ -112,10 +103,10 @@ int main()
 
     std::cout << "\nМедицинские работники:\n";
 
-    for (const std::unique_ptr<MedicalWorker>& worker
+    for (const std::reference_wrapper<const MedicalWorker>& worker
          : hospital.getWorkers())
     {
-        std::cout << worker->toString() << "\n\n";
+        std::cout << worker.get().toString() << "\n\n";
     }
 
     return 0;
