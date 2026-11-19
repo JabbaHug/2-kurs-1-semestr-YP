@@ -19,22 +19,21 @@ namespace miit::algebra
 
         for (std::size_t column = 0; column < columnCount; ++column)
         {
-            int maximum = matrix[column];
+            int maximum = matrix[0][column];
 
             for (std::size_t row = 1; row < rowCount; ++row)
             {
-                const int value = matrix[row * columnCount + column];
-                if (value > maximum)
+                if (matrix[row][column] > maximum)
                 {
-                    maximum = value;
+                    maximum = matrix[row][column];
                 }
             }
 
             for (std::size_t row = 0; row < rowCount; ++row)
             {
-                if (matrix[row * columnCount + column] == maximum)
+                if (matrix[row][column] == maximum)
                 {
-                    matrix[row * columnCount + column] = 0;
+                    matrix[row][column] = 0;
                 }
             }
         }

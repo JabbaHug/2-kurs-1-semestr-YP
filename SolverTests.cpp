@@ -81,8 +81,9 @@ namespace SolverTests
         TEST_METHOD(Matrix_ValueConstructor)
         {
             Matrix<int> matrix(2, 3, 7);
-            for (std::size_t index = 0; index < 6; ++index)
-                Assert::AreEqual(7, matrix[index]);
+            for (std::size_t row = 0; row < 2; ++row)
+                for (std::size_t column = 0; column < 3; ++column)
+                    Assert::AreEqual(7, matrix[row][column]);
         }
 
         TEST_METHOD(Matrix_FillGenerator)
@@ -90,40 +91,74 @@ namespace SolverTests
             Matrix<int> matrix(2, 2);
             ConstantGenerator generator(8);
             matrix.fill(generator);
-            for (std::size_t index = 0; index < 4; ++index)
-                Assert::AreEqual(8, matrix[index]);
+            for (std::size_t row = 0; row < 2; ++row)
+                for (std::size_t column = 0; column < 2; ++column)
+                    Assert::AreEqual(8, matrix[row][column]);
+        }
+
+        TEST_METHOD(Matrix_Index)
+        {
+            Matrix<int> matrix(2, 2);
+            matrix[0][0] = 1; matrix[0][1] = 2;
+            matrix[1][0] = 3; matrix[1][1] = 4;
+            Assert::AreEqual(1, matrix[0][0]);
+            Assert::AreEqual(2, matrix[0][1]);
+            Assert::AreEqual(3, matrix[1][0]);
+            Assert::AreEqual(4, matrix[1][1]);
+        }
+
+        TEST_METHOD(Matrix_IndexThrows)
+        {
+            Matrix<int> matrix(2, 2);
+            Assert::ExpectException<std::out_of_range>(
+                [&matrix]() { matrix[2]; }
+            );
         }
 
         TEST_METHOD(Matrix_RemoveColumn)
         {
             Matrix<int> matrix(2, 3);
-            matrix[0] = 1; matrix[1] = 2; matrix[2] = 3;
-            matrix[3] = 4; matrix[4] = 5; matrix[5] = 6;
+            matrix[0][0] = 1; matrix[0][1] = 2; matrix[0][2] = 3;
+            matrix[1][0] = 4; matrix[1][1] = 5; matrix[1][2] = 6;
             matrix.removeColumn(1);
             Assert::AreEqual<std::size_t>(2, matrix.columns());
-            Assert::AreEqual(1, matrix[0]);
-            Assert::AreEqual(3, matrix[1]);
-            Assert::AreEqual(4, matrix[2]);
-            Assert::AreEqual(6, matrix[3]);
+            Assert::AreEqual(1, matrix[0][0]);
+            Assert::AreEqual(3, matrix[0][1]);
+            Assert::AreEqual(4, matrix[1][0]);
+            Assert::AreEqual(6, matrix[1][1]);
         }
 
         TEST_METHOD(Matrix_InsertRowAfter)
         {
             Matrix<int> matrix(2, 2);
-            matrix[0] = 1; matrix[1] = 2;
-            matrix[2] = 3; matrix[3] = 4;
+            matrix[0][0] = 1; matrix[0][1] = 2;
+            matrix[1][0] = 3; matrix[1][1] = 4;
             matrix.insertRowAfter(0, std::vector<int>{9, 8});
             Assert::AreEqual<std::size_t>(3, matrix.rows());
-            Assert::AreEqual(9, matrix[2]);
-            Assert::AreEqual(8, matrix[3]);
+            Assert::AreEqual(1, matrix[0][0]);
+            Assert::AreEqual(9, matrix[1][0]);
+            Assert::AreEqual(8, matrix[1][1]);
+            Assert::AreEqual(3, matrix[2][0]);
+            Assert::AreEqual(4, matrix[2][1]);
         }
 
         TEST_METHOD(Matrix_ToString)
         {
             Matrix<int> matrix(2, 2);
-            matrix[0] = 1; matrix[1] = 2;
-            matrix[2] = 3; matrix[3] = 4;
+            matrix[0][0] = 1; matrix[0][1] = 2;
+            matrix[1][0] = 3; matrix[1][1] = 4;
             Assert::AreEqual(std::string("1 2\n3 4"), matrix.toString());
+        }
+
+        TEST_METHOD(Matrix_StreamInput)
+        {
+            Matrix<int> matrix(2, 2);
+            std::istringstream input("1 2 3 4");
+            input >> matrix;
+            Assert::AreEqual(1, matrix[0][0]);
+            Assert::AreEqual(2, matrix[0][1]);
+            Assert::AreEqual(3, matrix[1][0]);
+            Assert::AreEqual(4, matrix[1][1]);
         }
     };
 
@@ -138,12 +173,12 @@ namespace SolverTests
             Task1 task(2, 3, generator);
             task.solve();
             const Matrix<int>& result = task.getMatrix();
-            Assert::AreEqual(0, result[0]);
-            Assert::AreEqual(1, result[1]);
-            Assert::AreEqual(0, result[2]);
-            Assert::AreEqual(2, result[3]);
-            Assert::AreEqual(0, result[4]);
-            Assert::AreEqual(3, result[5]);
+            Assert::AreEqual(0, result[0][0]);
+            Assert::AreEqual(1, result[0][1]);
+            Assert::AreEqual(0, result[0][2]);
+            Assert::AreEqual(2, result[1][0]);
+            Assert::AreEqual(0, result[1][1]);
+            Assert::AreEqual(3, result[1][2]);
         }
 
         TEST_METHOD(Task2_Solve)
@@ -156,9 +191,17 @@ namespace SolverTests
             const Matrix<int>& result = task.getMatrix();
             Assert::AreEqual<std::size_t>(5, result.rows());
             Assert::AreEqual<std::size_t>(3, result.columns());
-            Assert::AreEqual(1, result[0]);
-            Assert::AreEqual(-5, result[3]);
-            Assert::AreEqual(1, result[6]);
+
+            const int expected[5][3] = {
+                {1, 2, 3},
+                {-5, 0, 1},
+                {1, 2, 3},
+                {2, 4, -5},
+                {1, 2, 3}
+            };
+            for (std::size_t row = 0; row < 5; ++row)
+                for (std::size_t column = 0; column < 3; ++column)
+                    Assert::AreEqual(expected[row][column], result[row][column]);
         }
     };
 }

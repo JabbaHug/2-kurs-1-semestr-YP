@@ -11,7 +11,7 @@ namespace miit::algebra
 
     void Task2::solve()
     {
-        if (matrix.rows() == 0 || matrix.columns() == 0)
+        if (matrix.empty())
         {
             return;
         }
@@ -20,12 +20,15 @@ namespace miit::algebra
         const std::size_t columnCount = matrix.columns();
 
         int maximumByAbsoluteValue = 0;
-        for (std::size_t index = 0; index < rowCount * columnCount; ++index)
+        for (std::size_t row = 0; row < rowCount; ++row)
         {
-            const int absolute = std::abs(matrix[index]);
-            if (absolute > maximumByAbsoluteValue)
+            for (std::size_t column = 0; column < columnCount; ++column)
             {
-                maximumByAbsoluteValue = absolute;
+                const int absolute = std::abs(matrix[row][column]);
+                if (absolute > maximumByAbsoluteValue)
+                {
+                    maximumByAbsoluteValue = absolute;
+                }
             }
         }
 
@@ -34,7 +37,7 @@ namespace miit::algebra
         {
             for (std::size_t column = 0; column < columnCount; ++column)
             {
-                if (std::abs(matrix[row * columnCount + column]) == maximumByAbsoluteValue)
+                if (std::abs(matrix[row][column]) == maximumByAbsoluteValue)
                 {
                     rowsContainingMaximum.push_back(row);
                     break;
@@ -42,13 +45,8 @@ namespace miit::algebra
             }
         }
 
-        std::vector<int> firstRow(columnCount);
-        for (std::size_t column = 0; column < columnCount; ++column)
-        {
-            firstRow[column] = matrix[column];
-        }
+        const std::vector<int> firstRow = matrix[0];
 
-        // Вставляем с конца, чтобы индексы ранее найденных строк не смещались.
         for (auto it = rowsContainingMaximum.rbegin(); it != rowsContainingMaximum.rend(); ++it)
         {
             matrix.insertRowAfter(*it, firstRow);
